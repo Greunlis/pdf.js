@@ -1,82 +1,45 @@
 <!doctype html>
-<html lang="en">
+<html>
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>PDF.js in about:blank iframe</title>
   <style>
-    body { font-family: system-ui, -apple-system, Segoe UI, sans-serif; margin: 24px; }
-    iframe { width: 100%; height: 85vh; border: 1px solid #aaa; border-radius: 8px; }
-    code { background: #f4f4f4; padding: 0.1rem 0.25rem; border-radius: 4px; }
-  </style>
-</head>
-<body>
-  <h1>PDF.js loaded inside an <code>about:blank</code> iframe</h1>
-  
-  <iframe id="pdfFrame" title="PDF.js about:blank iframe demo"></iframe>
-
-  <script>
-    const iframe = document.createElement('iframe');
-    iframe.title = 'PDF.js about:blank iframe demo';
-    iframe.src = 'about:blank';
-
-    const existing = document.getElementById('pdfFrame');
-    existing.replaceWith(iframe);
-
-
-      const iframeHtml = `<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <style>
-    body { font-family: system-ui, -apple-system, Segoe UI, sans-serif; margin: 20px; }
-    #status { margin-bottom: 12px; }
-    canvas { border: 1px solid #ccc; max-width: 100%; height: auto; }
-    pre { white-space: pre-wrap; background: #f8f8f8; padding: 12px; border-radius: 6px; }
-  </style>
-</head>
-<body>
-  <h2>Iframe document URL: about:blank</h2>
-  <div id="status">Loading PDF.js...</div>
-  <canvas id="pdfCanvas"></canvas>
-
-  <script src="vendor/pdf.min.js"><\/script>
-  <script>
-    const statusEl = document.getElementById('status');
-
-    async function main() {
-      // Explicitly provide the self-hosted worker before calling getDocument().
-      pdfjsLib.GlobalWorkerOptions.workerSrc = 'vendor/pdf.worker.js';
-
-      const loadingTask = pdfjsLib.getDocument('data:application/pdf;base64,JVBERi0xLjMKJZOMi54gUmVwb3J0TGFiIEdlbmVyYXRlZCBQREYgZG9jdW1lbnQgKG9wZW5zb3VyY2UpCjEgMCBvYmoKPDwKL0YxIDIgMCBSIC9GMiAzIDAgUgo+PgplbmRvYmoKMiAwIG9iago8PAovQmFzZUZvbnQgL0hlbHZldGljYSAvRW5jb2RpbmcgL1dpbkFuc2lFbmNvZGluZyAvTmFtZSAvRjEgL1N1YnR5cGUgL1R5cGUxIC9UeXBlIC9Gb250Cj4+CmVuZG9iagozIDAgb2JqCjw8Ci9CYXNlRm9udCAvSGVsdmV0aWNhLUJvbGQgL0VuY29kaW5nIC9XaW5BbnNpRW5jb2RpbmcgL05hbWUgL0YyIC9TdWJ0eXBlIC9UeXBlMSAvVHlwZSAvRm9udAo+PgplbmRvYmoKNCAwIG9iago8PAovQ29udGVudHMgOCAwIFIgL01lZGlhQm94IFsgMCAwIDYxMiA3OTIgXSAvUGFyZW50IDcgMCBSIC9SZXNvdXJjZXMgPDwKL0ZvbnQgMSAwIFIgL1Byb2NTZXQgWyAvUERGIC9UZXh0IC9JbWFnZUIgL0ltYWdlQyAvSW1hZ2VJIF0KPj4gL1JvdGF0ZSAwIC9UcmFucyA8PAoKPj4gCiAgL1R5cGUgL1BhZ2UKPj4KZW5kb2JqCjUgMCBvYmoKPDwKL1BhZ2VNb2RlIC9Vc2VOb25lIC9QYWdlcyA3IDAgUiAvVHlwZSAvQ2F0YWxvZwo+PgplbmRvYmoKNiAwIG9iago8PAovQXV0aG9yIChhbm9ueW1vdXMpIC9DcmVhdGlvbkRhdGUgKEQ6MjAyNjA3MDMwODQ3MjYrMDAnMDAnKSAvQ3JlYXRvciAoYW5vbnltb3VzKSAvS2V5d29yZHMgKCkgL01vZERhdGUgKEQ6MjAyNjA3MDMwODQ3MjYrMDAnMDAnKSAvUHJvZHVjZXIgKFJlcG9ydExhYiBQREYgTGlicmFyeSAtIFwob3BlbnNvdXJjZVwpKSAKICAvU3ViamVjdCAodW5zcGVjaWZpZWQpIC9UaXRsZSAoUERGLmpzIFNhbXBsZSBEb2N1bWVudCkgL1RyYXBwZWQgL0ZhbHNlCj4+CmVuZG9iago3IDAgb2JqCjw8Ci9Db3VudCAxIC9LaWRzIFsgNCAwIFIgXSAvVHlwZSAvUGFnZXMKPj4KZW5kb2JqCjggMCBvYmoKPDwKL0ZpbHRlciBbIC9BU0NJSTg1RGVjb2RlIC9GbGF0ZURlY29kZSBdIC9MZW5ndGggMzUyCj4+CnN0cmVhbQpHYXMyRWNWREQkJjtUYE8nWWdDXV9cUicmb2s7cUxpa2AuOyEpJzUtPThGO0AyOyxJKmRgL01KMGI+SHBwcUUvSSxPcERBZU1QKEpfS084QSJdUFlzWjR1UjUwNTswWyFbPlI6TjhvOlNqOHNWZG1pMSZwbitRLDdFNnE8dCQrbkpWJUNQNEplL0BRPihcYkJjX0ZaMFk6N1osKTU7Z0hsXXRjNCUwMSIrdChmKDlfbSYnPTtCUWEzK1xmLFpYLiZsSWBbNSg0TCkoWC4jOj9fQi8nRDEkLF8kbSwwRWUxaixtY1NYMSJeakR0M2tsU01ZbmdRb1FKPVxrT1lMIldoPThMSkw9b01PWTZWUTVhM0dLOUZTaTJERShPR2NdUGNGQFFjVmFgI3M9IlgqXDlEXkxZLF03PFpvUjNiRWo7UkhILGZlJEZzKEEyXTUhLjxLamhXODsjLnQsLjNKQX4+ZW5kc3RyZWFtCmVuZG9iagp4cmVmCjAgOQowMDAwMDAwMDAwIDY1NTM1IGYgCjAwMDAwMDAwNjEgMDAwMDAgbiAKMDAwMDAwMDEwMiAwMDAwMCBuIAowMDAwMDAwMjA5IDAwMDAwIG4gCjAwMDAwMDAzMjEgMDAwMDAgbiAKMDAwMDAwMDUxNCAwMDAwMCBuIAowMDAwMDAwNTgyIDAwMDAwIG4gCjAwMDAwMDA4NTcgMDAwMDAgbiAKMDAwMDAwMDkxNiAwMDAwMCBuIAp0cmFpbGVyCjw8Ci9JRCAKWzwyNTBmMmFlYmI5NTBmY2UyODU5YjA4MzQ0ZmU1MDE1Yz48MjUwZjJhZWJiOTUwZmNlMjg1OWIwODM0NGZlNTAxNWM+XQolIFJlcG9ydExhYiBnZW5lcmF0ZWQgUERGIGRvY3VtZW50IC0tIGRpZ2VzdCAob3BlbnNvdXJjZSkKCi9JbmZvIDYgMCBSCi9Sb290IDUgMCBSCi9TaXplIDkKPj4Kc3RhcnR4cmVmCjEzNTgKJSVFT0');
-      const pdf = await loadingTask.promise;
-      statusEl.textContent = 'Loaded sample.pdf with ' + pdf.numPages + ' page(s). Rendering page 1...';
-
-      const page = await pdf.getPage(1);
-      const viewport = page.getViewport({ scale: 1.5 });
-      const canvas = document.getElementById('pdfCanvas');
-      const context = canvas.getContext('2d');
-      canvas.width = Math.floor(viewport.width);
-      canvas.height = Math.floor(viewport.height);
-
-      await page.render({ canvasContext: context, viewport }).promise;
-      statusEl.textContent = 'Success: sample.pdf rendered using local pdf.min.js and local pdf.worker.js.';
+    body {
+      font-family: system-ui, sans-serif;
+      margin: 20px;
     }
 
-    main().catch(error => {
-      console.error(error);
-      statusEl.innerHTML = '<strong>Failed:</strong><pre></pre>';
-      statusEl.querySelector('pre').textContent = error && error.stack ? error.stack : String(error);
-    });
-  <\/script>
-</body>
-</html>`;
+    iframe {
+      width: 100%;
+      height: 800px;
+      border: 1px solid #ccc;
+    }
+  </style>
+</head>
+<body>
+  <h1>PDF.js inside an about:blank iframe</h1>
+  <p>
+    This parent page creates an <code>about:blank</code> iframe, then writes
+    an HTML document into it. The iframe loads PDF.js and renders a sample PDF
+    from a <code>data:</code> URI.
+  </p>
 
-      const doc = iframe.contentWindow.document;
-      doc.open();
-      doc.write(iframeHtml);
-      doc.close();
+  <iframe id="pdf-frame" src="about:blank"></iframe>
 
+  <script>
+    const samplePdfDataUri = `data:application/pdf;base64,JVBERi0xLjMKJZOMi54gUmVwb3J0TGFiIEdlbmVyYXRlZCBQREYgZG9jdW1lbnQgKG9wZW5zb3VyY2UpCjEgMCBvYmoKPDwKL0YxIDIgMCBSIC9GMiAzIDAgUgo+PgplbmRvYmoKMiAwIG9iago8PAovQmFzZUZvbnQgL0hlbHZldGljYSAvRW5jb2RpbmcgL1dpbkFuc2lFbmNvZGluZyAvTmFtZSAvRjEgL1N1YnR5cGUgL1R5cGUxIC9UeXBlIC9Gb250Cj4+CmVuZG9iagozIDAgb2JqCjw8Ci9CYXNlRm9udCAvSGVsdmV0aWNhLUJvbGQgL0VuY29kaW5nIC9XaW5BbnNpRW5jb2RpbmcgL05hbWUgL0YyIC9TdWJ0eXBlIC9UeXBlMSAvVHlwZSAvRm9udAo+PgplbmRvYmoKNCAwIG9iago8PAovQ29udGVudHMgOCAwIFIgL01lZGlhQm94IFsgMCAwIDYxMiA3OTIgXSAvUGFyZW50IDcgMCBSIC9SZXNvdXJjZXMgPDwKL0ZvbnQgMSAwIFIgL1Byb2NTZXQgWyAvUERGIC9UZXh0IC9JbWFnZUIgL0ltYWdlQyAvSW1hZ2VJIF0KPj4gL1JvdGF0ZSAwIC9UcmFucyA8PAoKPj4gCiAgL1R5cGUgL1BhZ2UKPj4KZW5kb2JqCjUgMCBvYmoKPDwKL1BhZ2VNb2RlIC9Vc2VOb25lIC9QYWdlcyA3IDAgUiAvVHlwZSAvQ2F0YWxvZwo+PgplbmRvYmoKNiAwIG9iago8PAovQXV0aG9yIChhbm9ueW1vdXMpIC9DcmVhdGlvbkRhdGUgKEQ6MjAyNjA3MDMwODQ3MjYrMDAnMDAnKSAvQ3JlYXRvciAoYW5vbnltb3VzKSAvS2V5d29yZHMgKCkgL01vZERhdGUgKEQ6MjAyNjA3MDMwODQ3MjYrMDAnMDAnKSAvUHJvZHVjZXIgKFJlcG9ydExhYiBQREYgTGlicmFyeSAtIFwob3BlbnNvdXJjZVwpKSAKICAvU3ViamVjdCAodW5zcGVjaWZpZWQpIC9UaXRsZSAoUERGLmpzIFNhbXBsZSBEb2N1bWVudCkgL1RyYXBwZWQgL0ZhbHNlCj4+CmVuZG9iago3IDAgb2JqCjw8Ci9Db3VudCAxIC9LaWRzIFsgNCAwIFIgXSAvVHlwZSAvUGFnZXMKPj4KZW5kb2JqCjggMCBvYmoKPDwKL0ZpbHRlciBbIC9BU0NJSTg1RGVjb2RlIC9GbGF0ZURlY29kZSBdIC9MZW5ndGggMzUyCj4+CnN0cmVhbQpHYXMyRWNWREQkJjtUYE8nWWdDXV9cUicmb2s7cUxpa2AuOyEpJzUtPThGO0AyOyxJKmRgL01KMGI+SHBwcUUvSSxPcERBZU1QKEpfS084QSJdUFlzWjR1UjUwNTswWyFbPlI6TjhvOlNqOHNWZG1pMSZwbitRLDdFNnE8dCQrbkpWJUNQNEplL0BRPihcYkJjX0ZaMFk6N1osKTU7Z0hsXXRjNCUwMSIrdChmKDlfbSYnPTtCUWEzK1xmLFpYLiZsSWBbNSg0TCkoWC4jOj9fQi8nRDEkLF8kbSwwRWUxaixtY1NYMSJeakR0M2tsU01ZbmdRb1FKPVxrT1lMIldoPThMSkw9b01PWTZWUTVhM0dLOUZTaTJERShPR2NdUGNGQFFjVmFgI3M9IlgqXDlZLF03PFpvUjNiRWo7UkhILGZlJEZzKEEyXTUhLjxLamhXODsjLnQsLjNKQX4+ZW5kc3RyZWFtCmVuZG9iagp4cmVmCjAgOQowMDAwMDAwMDAwIDY1NTM1IGYgCjAwMDAwMDAwNjEgMDAwMDAgbiAKMDAwMDAwMDEwMiAwMDAwMCBuIAowMDAwMDAwMjA5IDAwMDAwIG4gCjAwMDAwMDAzMjEgMDAwMDAgbiAKMDAwMDAwMDUxNCAwMDAwMCBuIAowMDAwMDAwNTgyIDAwMDAwIG4gCjAwMDAwMDA4NTcgMDAwMDAgbiAKMDAwMDAwMDkxNiAwMDAwMCBuIAp0cmFpbGVyCjw8Ci9JRCAKWzwyNTBmMmFlYmI5NTBmY2UyODU5YjA4MzQ0ZmU1MDE1Yz48MjUwZjJhZWJiOTUwZmNlMjg1OWIwODM0NGZlNTAxNWM+XQolIFJlcG9ydExhYiBnZW5lcmF0ZWQgUERGIGRvY3VtZW50IC0tIGRpZ2VzdCAob3BlbnNvdXJjZSkKCi9JbmZvIDYgMCBSCi9Sb290IDUgMCBSCi9TaXplIDkKPj4Kc3RhcnR4cmVmCjEzNTgKJSVFT0YK`;
+
+    const iframe = document.getElementById("pdf-frame");
+    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+
+    const pdfJsScript = iframeDoc.createElement('script');
+    pdfJsScript.src = 'vendor/pdf.min.js';
+    pdfJsScript.onload = () => {
+      const appScript = iframeDoc.createElement('script');
+      appScript.textContent = `...`;
+      iframeDoc.body.append(appScript);
+    };
+    iframeDoc.body.append(pdfJsScript);
   </script>
 </body>
 </html>
