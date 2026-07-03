@@ -2079,8 +2079,6 @@ class PDFWorker {
           : "./pdf.worker.mjs";
       }
 
-      // false.
-      this._isSameOrigin = (baseUrl, otherUrl) => {
         if (baseUrl === "about:blank") {
             return this._isSameOrigin(window.parent, otherUrl);
         const base = URL.parse(baseUrl);
